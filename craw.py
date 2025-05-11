@@ -2,13 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 from elasticsearch import Elasticsearch
-import time
 
 # Configuration
 MONGO_URI = 'mongodb://localhost:27017'
 DB_NAME = 'webdata'
 ES_HOST = 'http://localhost:9200'
-HEADERS = {'User-Agent': 'Mozilla/5.0'}  # Agar tidak ditolak Google
+HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
 # Initialize clients
 mongo_client = MongoClient(MONGO_URI)
@@ -43,7 +42,7 @@ def index_in_elasticsearch(page_data):
         es_data = {
             'url': page_data['url'],
             'title': page_data['title'] or '',
-            'content': page_data['content'] or '',
+            'content': page_data['html'] or '',
             'meta': page_data['meta'] or []
         }
         if not es_client.exists(index='webpages', id=page_data['url']):
@@ -64,13 +63,12 @@ def crawl(url, depth=0, max_depth=2):
         page_data = {
             'url': url,
             'title': soup.title.string if soup.title else '',
-            'content': soup.get_text(),
+            'html': response.text,
             'meta': [meta.get('content') for meta in soup.find_all('meta') if meta.get('content')]
         }
         store_in_mongo(page_data)
         index_in_elasticsearch(page_data)
 
-        # Crawl inner links
         for link in soup.find_all('a', href=True):
             href = link['href']
             if href.startswith('http'):
@@ -78,7 +76,6 @@ def crawl(url, depth=0, max_depth=2):
     except Exception as e:
         print(f'Error crawling {url}: {e}')
 
-# Get links from Google Search results
 # Get links from Bing Search results
 def get_bing_links(keyword):
     print(f"Searching Bing for: {keyword}")
@@ -96,7 +93,6 @@ def get_bing_links(keyword):
         print(f"Error fetching Bing results: {e}")
         return []
 
-
 # Read keywords from file and start crawling
 def start_from_keywords(file_path='keyword.txt'):
     try:
@@ -106,7 +102,6 @@ def start_from_keywords(file_path='keyword.txt'):
             links = get_bing_links(keyword)
             for link in links:
                 crawl(link)
-                time.sleep(1)  # Delay to avoid getting blocked
     except FileNotFoundError:
         print("Keyword file not found.")
     except Exception as e:
