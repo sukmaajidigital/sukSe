@@ -2,122 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Search Engine Buah</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Smart Search</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 20px;
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+      }
+      .image-card {
+        display: inline-block;
+        width: 200px;
+        vertical-align: top;
+      }
+      .tab {
+        margin: 10px;
+        cursor: pointer;
+        display: inline-block;
+      }
+      .active-tab {
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    </style>
   </head>
-  <body class="bg-gray-100 font-sans">
-    <div class="max-w-6xl mx-auto mt-10 px-4">
-      <h1 class="text-4xl font-bold mb-6 text-center">🍉 Pencarian Informasi Buah-Buahan</h1>
+  <body>
+    <h2>Search Engine</h2>
+    <input type="text" id="queryInput" placeholder="Search..." />
+    <button onclick="doSearch()">Search</button>
 
-      <!-- Search Bar -->
-      <div class="flex flex-col sm:flex-row items-center gap-4">
-        <input
-          type="text"
-          id="query"
-          placeholder="Cari informasi tentang buah..."
-          class="flex-1 p-3 rounded-lg border border-gray-300"
-          onkeypress="handleKey(event)"
-        />
-        <button
-          onclick="search()"
-          class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg"
-        >
-          Cari
-        </button>
-      </div>
-
-      <!-- Tabs -->
-      <div class="mt-6">
-        <ul class="flex space-x-4 border-b-2">
-          <li>
-            <button
-              class="tab-button py-2 px-4 border-b-2 border-green-500"
-              onclick="switchTab('web')"
-            >
-              Web
-            </button>
-          </li>
-          <li>
-            <button
-              class="tab-button py-2 px-4 text-gray-500 hover:text-black"
-              onclick="switchTab('images')"
-            >
-              Gambar
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Results -->
-      <div id="results" class="mt-8">
-        <div id="result-list" class="grid grid-cols-1 lg:grid-cols-4 gap-6"></div>
-      </div>
+    <div>
+      <span class="tab" id="tab-web" onclick="switchTab('web')">Web</span>
+      <span class="tab" id="tab-images" onclick="switchTab('images')">Images</span>
     </div>
 
-    <script>
-      let currentTab = "web";
+    <div id="resultsContainer"></div>
+    <div id="paginationContainer"></div>
 
-      function handleKey(event) {
-        if (event.key === "Enter") search();
-      }
+    <script>
+      let currentTab = new URLSearchParams(window.location.search).get("type") || "web";
+      let currentPage = parseInt(new URLSearchParams(window.location.search).get("page")) || 1;
+      let query = new URLSearchParams(window.location.search).get("q") || "";
+
+      document.getElementById("queryInput").value = query;
+      document.getElementById("tab-" + currentTab).classList.add("active-tab");
 
       function switchTab(tab) {
         currentTab = tab;
-        document
-          .querySelectorAll(".tab-button")
-          .forEach((btn) => btn.classList.remove("border-b-2", "border-green-500"));
-        event.target.classList.add("border-b-2", "border-green-500");
-        search();
+        currentPage = 1;
+        doSearch();
       }
 
-      function search() {
-        const query = document.getElementById("query").value;
-        fetch(`/search?q=${encodeURIComponent(query)}&type=${currentTab}`)
+      function doSearch() {
+        const q = document.getElementById("queryInput").value;
+        const params = new URLSearchParams({ q, type: currentTab, page: currentPage });
+        history.pushState({}, "", `/?${params}`);
+        fetchResults(q, currentTab, currentPage);
+      }
+
+      function changePage(page) {
+        currentPage = page;
+        doSearch();
+      }
+
+      function fetchResults(q, type, page) {
+        fetch(`/search?q=${q}&type=${type}&page=${page}`)
           .then((res) => res.json())
           .then((data) => {
-            const list = document.getElementById("result-list");
-            list.innerHTML = "";
+            const container = document.getElementById("resultsContainer");
+            const pagination = document.getElementById("paginationContainer");
+            container.innerHTML = "";
+            pagination.innerHTML = "";
 
-            if (data.length === 0) {
-              list.innerHTML = '<p class="text-gray-500">Tidak ada hasil ditemukan.</p>';
-              return;
-            }
+            data.results.forEach((group) => {
+              const groupDiv = document.createElement("div");
+              groupDiv.innerHTML = `<h4>${group.domain}</h4>`;
 
-            data.forEach((item) => {
-              const div = document.createElement("div");
-              div.className = "p-4 bg-white rounded-lg shadow";
+              group.pages.forEach((item) => {
+                const div = document.createElement("div");
+                if (type === "images") {
+                  div.className = "card image-card";
+                  div.innerHTML = `<a href="${item.url}" target="_blank"><img src="${item.image}" width="180"><p>${item.title}</p></a>`;
+                } else {
+                  div.className = "card";
+                  div.innerHTML = `<a href="${item.url}" target="_blank"><h4>${item.title}</h4></a><p>${item.snippet}</p>`;
+                }
+                groupDiv.appendChild(div);
+              });
 
-              if (currentTab === "images") {
-                let imageUrl = item.image || "https://via.placeholder.com/100x80?text=Gambar";
-                div.innerHTML = `
-            <a href="${item.url}" target="_blank">
-              <img src="${imageUrl}" alt="img" class="w-full h-48 object-cover rounded hover:opacity-80 transition">
-            </a>
-          `;
-              } else {
-                let imageUrl = item.image || "https://via.placeholder.com/100x80?text=Gambar";
-                div.innerHTML = `
-            <div class="flex items-start gap-4">
-              <img src="${imageUrl}" alt="img" class="w-24 h-20 object-cover rounded">
-              <div>
-                <a href="${
-                  item.url
-                }" target="_blank" class="text-blue-600 font-semibold text-lg hover:underline">
-                  ${item.title || item.url}
-                </a>
-                <p class="text-gray-600 mt-1 text-sm">${item.snippet}</p>
-              </div>
-            </div>
-          `;
-              }
-
-              list.appendChild(div);
+              container.appendChild(groupDiv);
             });
+
+            for (let i = 1; i <= data.pagination.total_pages; i++) {
+              const btn = document.createElement("button");
+              btn.innerText = i;
+              btn.disabled = i === data.pagination.current;
+              btn.onclick = () => changePage(i);
+              pagination.appendChild(btn);
+            }
           });
       }
 
-      function preview(url) {
-        document.getElementById("preview-image").src = url;
+      if (query) {
+        fetchResults(query, currentTab, currentPage);
       }
     </script>
   </body>
