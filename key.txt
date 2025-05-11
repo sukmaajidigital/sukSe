@@ -1,0 +1,101 @@
+anime
+Quantum Computing
+Machine Learning
+Deep Learning
+Neural Networks
+Natural Language Processing (NLP)
+Computer Vision
+Blockchain
+Cryptocurrency
+NFT (Non-Fungible Token)
+Metaverse
+Web3
+Smart Contracts
+Solidity
+Rust
+GoLang
+Python
+TensorFlow
+PyTorch
+OpenCV
+Big Data
+Data Mining
+Data Analysis
+Data Engineering
+Data Science
+Data Warehouse
+ETL (Extract, Transform, Load)
+Apache Hadoop
+Apache Spark
+Kubernetes
+Docker
+Microservices
+Serverless Architecture
+Cloud Computing
+AWS (Amazon Web Services)
+Azure
+Google Cloud Platform
+SaaS (Software as a Service)
+PaaS (Platform as a Service)
+IaaS (Infrastructure as a Service)
+DevOps
+CI/CD (Continuous Integration/Continuous Deployment)
+Agile Methodology
+Scrum
+Kanban
+Lean Development
+Blockchain Consensus Algorithms
+Proof of Work (PoW)
+Proof of Stake (PoS)
+Delegated Proof of Stake (DPoS)
+Zero-Knowledge Proofs
+Homomorphic Encryption
+Cybersecurity
+Ethical Hacking
+Penetration Testing
+SQL Injection
+Cross-Site Scripting (XSS)
+Cross-Site Request Forgery (CSRF)
+Zero-Day Exploit
+Internet of Things (IoT)
+Edge Computing
+Fog Computing
+5G Technology
+WiFi 6
+Augmented Reality (AR)
+Virtual Reality (VR)
+Mixed Reality (MR)
+Extended Reality (XR)
+Digital Twins
+Smart Cities
+Autonomous Vehicles
+Drones
+Robotics
+Chatbots
+Conversational AI
+OpenAI
+GPT Models
+BERT (Bidirectional Encoder Representations from Transformers)
+GAN (Generative Adversarial Networks)
+Reinforcement Learning
+Unsupervised Learning
+Supervised Learning
+Semi-Supervised Learning
+Federated Learning
+Transfer Learning
+Feature Engineering
+Hyperparameter Tuning
+Predictive Analytics
+Prescriptive Analytics
+Descriptive Analytics
+Regression Analysis
+Classification
+Clustering
+Association Rules
+Decision Trees
+Random Forest
+Support Vector Machine (SVM)
+K-Nearest Neighbors (KNN)
+Naive Bayes
+Genetic Algorithms
+Particle Swarm Optimization
