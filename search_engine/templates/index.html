@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Search Engine Buah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <div class="max-w-6xl mx-auto mt-10 px-4">
+      <h1 class="text-4xl font-bold mb-6 text-center">🍉 Pencarian Informasi Buah-Buahan</h1>
+
+      <!-- Search Bar -->
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <input
+          type="text"
+          id="query"
+          placeholder="Cari informasi tentang buah..."
+          class="flex-1 p-3 rounded-lg border border-gray-300"
+          onkeypress="handleKey(event)"
+        />
+        <button
+          onclick="search()"
+          class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg"
+        >
+          Cari
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mt-6">
+        <ul class="flex space-x-4 border-b-2">
+          <li>
+            <button
+              class="tab-button py-2 px-4 border-b-2 border-green-500"
+              onclick="switchTab('web')"
+            >
+              Web
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button py-2 px-4 text-gray-500 hover:text-black"
+              onclick="switchTab('images')"
+            >
+              Gambar
+            </button>
+          </li>
+          <li>
+            <button
+              class="tab-button py-2 px-4 text-gray-500 hover:text-black"
+              onclick="switchTab('videos')"
+            >
+              Video
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Results -->
+      <div id="results" class="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Search List -->
+        <div class="lg:col-span-3 space-y-6" id="result-list"></div>
+
+        <!-- Image Preview Side Panel -->
+        <div id="preview-panel" class="hidden lg:block">
+          <h2 class="text-xl font-semibold mb-2">Pratinjau Gambar</h2>
+          <img
+            id="preview-image"
+            src="https://via.placeholder.com/300x200?text=Gambar"
+            alt="Preview"
+            class="rounded-lg shadow w-full"
+          />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentTab = "web";
+
+      function handleKey(event) {
+        if (event.key === "Enter") search();
+      }
+
+      function switchTab(tab) {
+        currentTab = tab;
+        document
+          .querySelectorAll(".tab-button")
+          .forEach((btn) => btn.classList.remove("border-b-2", "border-green-500"));
+        event.target.classList.add("border-b-2", "border-green-500");
+        search();
+      }
+
+      function search() {
+        const query = document.getElementById("query").value;
+        fetch(`/search?q=${encodeURIComponent(query)}&type=${currentTab}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const list = document.getElementById("result-list");
+            list.innerHTML = "";
+            if (data.length === 0) {
+              list.innerHTML = '<p class="text-gray-500">Tidak ada hasil ditemukan.</p>';
+              return;
+            }
+            data.forEach((item) => {
+              const div = document.createElement("div");
+              div.className = "p-4 bg-white rounded-lg shadow";
+              let imageUrl = item.image || "https://via.placeholder.com/100x80?text=Gambar";
+              div.innerHTML = `
+                            <div class="flex items-start gap-4">
+                                <img src="${imageUrl}" alt="img" class="w-24 h-20 object-cover rounded" onclick="preview('${imageUrl}')">
+                                <div>
+                                    <a href="${
+                                      item.url
+                                    }" target="_blank" class="text-blue-600 font-semibold text-lg hover:underline">${
+                item.title || item.url
+              }</a>
+                                    <p class="text-gray-600 mt-1 text-sm">${item.snippet}</p>
+                                </div>
+                            </div>`;
+              list.appendChild(div);
+            });
+          });
+      }
+
+      function preview(url) {
+        document.getElementById("preview-image").src = url;
+      }
+    </script>
+  </body>
+</html>
