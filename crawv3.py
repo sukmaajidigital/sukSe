@@ -11,6 +11,7 @@ DB_NAME = 'crawlingdata'
 ES_HOST = 'http://localhost:9200'
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
+#halooo
 # Initialize clients
 mongo_client = MongoClient(MONGO_URI)
 es_client = Elasticsearch([ES_HOST], verify_certs=False)
